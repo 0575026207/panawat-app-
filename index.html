@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#123d32">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icons/icon-192.png">
+
+<title>دفتر كراء البانوات</title>
+<style>
+:root{--green:#176b50;--dark:#123d32;--bg:#f3f6f4;--line:#dce6e0;--red:#b42318;--amber:#9a6700}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:#17231d;font-family:Arial,Tahoma,sans-serif}
+header{background:linear-gradient(135deg,var(--dark),var(--green));color:white;padding:22px 16px 18px}
+.wrap{max-width:900px;margin:auto;padding:14px}
+h1{font-size:23px;margin:0 0 6px}header p{margin:0;color:#d8eee4;font-size:14px}
+nav{display:flex;gap:8px;flex-wrap:wrap;margin:14px auto 0;max-width:900px;padding:0 14px}
+nav button,.btn{border:0;border-radius:10px;padding:11px 14px;font-weight:bold;cursor:pointer}
+nav button{background:#e3ece7;color:var(--dark)}nav button.active,.primary{background:var(--green);color:white}
+.card{background:white;border:1px solid var(--line);border-radius:15px;padding:15px;margin:12px 0;box-shadow:0 2px 8px #193c2b08}
+h2{font-size:18px;margin:0 0 13px}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:11px}
+label{display:block;font-size:13px;color:#52635a;margin:0 0 5px}
+input,select{width:100%;padding:11px;border:1px solid #cbd8d0;border-radius:9px;font-size:15px;background:white;color:#17231d}
+input:focus,select:focus{outline:2px solid #8dc7aa;border-color:var(--green)}
+.full{grid-column:1/-1}.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:13px}
+.btn{font-size:14px}.secondary{background:#e9efeb;color:#234537}.danger{background:#fff0ee;color:var(--red)}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}.stat{background:#f1f7f3;border-radius:11px;padding:12px}.stat small{color:#5b6c62}.stat strong{display:block;font-size:20px;margin-top:5px}
+.muted{color:#68786f;font-size:13px}.notice{padding:11px;border-radius:10px;background:#fff5df;color:#755300;margin:10px 0;font-size:13px}
+.due{border-right:4px solid var(--red)}.returned{border-right:4px solid var(--green)}
+.record{border:1px solid var(--line);border-radius:12px;padding:12px;margin:9px 0;background:#fff}
+.record h3{font-size:16px;margin:0 0 7px}.meta{display:flex;gap:8px;flex-wrap:wrap;font-size:13px;color:#53645a;margin:5px 0}
+.pill{display:inline-block;padding:4px 8px;border-radius:20px;background:#eaf2ed;color:#23553f;font-size:12px}.pill.red{background:#ffebe9;color:#a52218}.pill.amber{background:#fff3d5;color:#815900}
+.hidden{display:none!important}.total{font-size:22px;color:var(--green);font-weight:bold}
+footer{font-size:12px;color:#68786f;padding:16px;text-align:center}
+@media(max-width:560px){.grid{grid-template-columns:1fr}.stats{grid-template-columns:1fr 1fr}.wrap{padding:10px}}
+</style></head>
+<body>
+<header><div class="wrap"><h1>📋 دفتر كراء البانوات</h1><p>تسيير الزبائن، العقود، التواريخ والحسابات بالدينار الجزائري</p></div></header>
+<nav>
+<button class="active" data-tab="new">＋ عقد جديد</button><button data-tab="records">📁 العقود والزبائن</button><button data-tab="alerts">🔔 تنبيهات الرجوع</button><button data-tab="stats">📊 الحسابات</button>
+</nav>
+<main class="wrap">
+<section id="new" class="tab">
+<div class="card"><h2 id="formTitle">معلومات الزبون والكراء</h2>
+<form id="contractForm">
+<input type="hidden" id="editId">
+<div class="grid">
+<div><label>اسم ولقب الزبون *</label><input id="name" required placeholder="اسم الزبون"></div>
+<div><label>رقم الهاتف *</label><input id="phone" required inputmode="tel" placeholder="05 / 06 / 07"></div>
+<div class="full"><label>رقم بطاقة التعريف الوطنية</label><input id="nid" placeholder="رقم بطاقة التعريف"></div>
+<div><label>نوع البانّو *</label><input id="kind" required placeholder="مثلاً: بانّو خشب / حديد"></div>
+<div><label>عدد البانوات *</label><input id="qty" type="number" min="1" step="1" value="1" required></div>
+<div><label>تاريخ بداية الكراء *</label><input id="start" type="date" required></div>
+<div><label>تاريخ الرجوع المتفق عليه *</label><input id="end" type="date" required></div>
+<div class="full"><label>طريقة الحساب</label><select id="mode"><option value="day">سعر البانّو في اليوم</option><option value="fixed">سعر البانّو لكامل مدة الكراء</option></select></div>
+<div id="dailyWrap"><label>سعر البانّو الواحد في اليوم (DA)</label><input id="daily" type="number" min="0" step="0.01" value="100"></div>
+<div id="fixedWrap" class="hidden"><label>سعر البانّو الواحد لكامل المدة (DA)</label><input id="fixed" type="number" min="0" step="0.01" value="500"></div>
+<div><label>المبلغ المدفوع (DA)</label><input id="paid" type="number" min="0" step="0.01" value="0"></div>
+<div><label>ملاحظة (اختياري)</label><input id="note" placeholder="مثلاً: عنوان الورشة"></div>
+</div>
+<div class="card" style="background:#f5faf6;margin-top:14px">
+<div class="meta"><span>مدة الكراء: <b id="days">—</b> يوم</span><span>المبلغ الإجمالي:</span></div>
+<div class="total" id="total">0 DA</div>
+<div class="meta"><span>الباقي: <b id="balance">0 DA</b></span></div>
+<p class="muted">يُحتسب يوم البداية ويوم النهاية ضمن المدة. راجع التواريخ قبل الحفظ.</p>
+</div>
+<div class="actions"><button class="btn primary" type="submit">💾 حفظ العقد</button><button class="btn secondary" type="button" id="reset">تفريغ الخانات</button></div>
+</form></div></section>
+<section id="records" class="tab hidden">
+<div class="card"><h2>العقود والزبائن</h2><input id="search" placeholder="ابحث بالاسم أو الهاتف أو رقم البطاقة..."><div id="recordList"></div></div>
+</section>
+<section id="alerts" class="tab hidden"><div class="card"><h2>تنبيهات رجوع البانوات</h2><p class="muted">العقود التي تجاوزت تاريخ الرجوع ولم تُعلّم على أنها مُرجعة تظهر هنا.</p><div id="alertList"></div></div></section>
+<section id="stats" class="tab hidden">
+<div class="card"><h2>ملخص الحسابات</h2><div class="stats">
+<div class="stat"><small>عدد العقود</small><strong id="sContracts">0</strong></div>
+<div class="stat"><small>البانوات خارج المخزن</small><strong id="sOut">0</strong></div>
+<div class="stat"><small>المداخيل الإجمالية</small><strong id="sTotal">0</strong></div>
+<div class="stat"><small>المبلغ المقبوض</small><strong id="sPaid">0</strong></div>
+<div class="stat"><small>المبالغ المتبقية</small><strong id="sDue">0</strong></div>
+<div class="stat"><small>عقود متأخرة</small><strong id="sLate">0</strong></div>
+</div><div class="actions"><button class="btn secondary" id="export">⬇️ تصدير نسخة احتياطية</button><label class="btn secondary" for="importFile" style="cursor:pointer">⬆️ استرجاع نسخة</label><input id="importFile" type="file" accept="application/json" class="hidden"></div></div>
+<div class="notice">البيانات تُحفظ في هذا المتصفح على هذا الجهاز فقط. صدّر نسخة احتياطية بانتظام، ولا تشارك الملف لأنه يحتوي على معلومات شخصية.</div>
+</section>
+<div class="notice">🔒 الخصوصية: رقم بطاقة التعريف معلومة حساسة. هذا التطبيق لا يرسل بياناتك إلى الإنترنت، لكن أي شخص يستطيع فتح نفس الجهاز والمتصفح قد يرى السجلات. استعمل قفل الهاتف ولا تحفظ بيانات لا تحتاجها.</div>
+</main><footer>دفتر كراء البانوات • نسخة محلية على جهازك</footer>
+<script>
+if ("serviceWorker" in navigator) { window.addEventListener("load", () => navigator.serviceWorker.register("./sw.js").catch(()=>{})); }
+let deferredInstallPrompt; window.addEventListener("beforeinstallprompt", e => { e.preventDefault(); deferredInstallPrompt=e; const b=document.createElement("button"); b.className="btn primary"; b.textContent="📲 تثبيت التطبيق على الهاتف"; b.style.cssText="display:block;margin:10px auto"; b.onclick=async()=>{deferredInstallPrompt.prompt(); await deferredInstallPrompt.userChoice; deferredInstallPrompt=null; b.remove();}; document.querySelector("footer").before(b); });
+</script>
+<script>
+const $=id=>document.getElementById(id), KEY='panels_rental_records_v1';
+let records=[];try{records=JSON.parse(localStorage.getItem(KEY)||'[]')}catch(e){records=[]}
+const money=n=>(Number(n)||0).toLocaleString('fr-FR',{maximumFractionDigits:2})+' DA';
+const today=()=>{let d=new Date();return new Date(d.getTime()-d.getTimezoneOffset()*60000).toISOString().slice(0,10)};
+$('start').value=today();let tomorrow=new Date();tomorrow.setDate(tomorrow.getDate()+1);$('end').value=new Date(tomorrow.getTime()-tomorrow.getTimezoneOffset()*60000).toISOString().slice(0,10);
+function duration(a,b){if(!a||!b)return 0;return Math.floor((new Date(b+'T12:00:00')-new Date(a+'T12:00:00'))/86400000)+1}
+function calc(){let d=duration($('start').value,$('end').value),q=+$('qty').value||0;let total=$('mode').value==='day'?q*d*(+$('daily').value||0):q*(+$('fixed').value||0);$('days').textContent=d>0?d:'تاريخ غير صحيح';$('total').textContent=money(total);$('balance').textContent=money(total-(+$('paid').value||0));$('dailyWrap').classList.toggle('hidden',$('mode').value!=='day');$('fixedWrap').classList.toggle('hidden',$('mode').value!=='fixed');return {d,total};}
+['start','end','qty','mode','daily','fixed','paid'].forEach(id=>$(id).addEventListener('input',calc));$('mode').addEventListener('change',calc);
+function save(){localStorage.setItem(KEY,JSON.stringify(records))}
+function status(r){return r.returned?'returned':(r.end<today()?'late':'active')}
+function render(){let term=$('search').value?.trim().toLowerCase()||'';let list=records.filter(r=>[r.name,r.phone,r.nid,r.kind].join(' ').toLowerCase().includes(term));$('recordList').innerHTML=list.length?list.slice().reverse().map(card).join(''):'<p class="muted">ما كاين حتى عقد مسجل.</p>';let late=records.filter(r=>status(r)==='late');$('alertList').innerHTML=late.length?late.map(card).join(''):'<p class="muted">ما كاين حتى عقد متأخر حالياً. 👍</p>';let active=records.filter(r=>!r.returned);$('sContracts').textContent=records.length;$('sOut').textContent=active.reduce((s,r)=>s+Number(r.qty),0);$('sTotal').textContent=money(records.reduce((s,r)=>s+r.total,0));$('sPaid').textContent=money(records.reduce((s,r)=>s+r.paid,0));$('sDue').textContent=money(records.reduce((s,r)=>s+Math.max(0,r.total-r.paid),0));$('sLate').textContent=late.length;}
+function card(r){let st=status(r),label=st==='late'?'متأخر – لم يرجع':st==='returned'?'تم الإرجاع':'مازال عند الزبون';return `<article class="record ${st==='late'?'due':st==='returned'?'returned':''}"><h3>${esc(r.name)} <span class="pill ${st==='late'?'red':st==='active'?'amber':''}">${label}</span></h3><div class="meta"><span>📞 ${esc(r.phone)}</span><span>البانوات: ${r.qty} × ${esc(r.kind)}</span></div><div class="meta"><span>من ${r.start} إلى ${r.end}</span><span>${r.days} يوم</span></div><div class="meta"><span>الإجمالي: <b>${money(r.total)}</b></span><span>المدفوع: ${money(r.paid)}</span><span>الباقي: <b>${money(r.total-r.paid)}</b></span></div>${r.nid?`<div class="meta">بطاقة التعريف: ${esc(r.nid)}</div>`:''}${r.note?`<div class="meta">ملاحظة: ${esc(r.note)}</div>`:''}<div class="actions">${!r.returned?`<button class="btn primary" onclick="markReturned('${r.id}')">✓ تأكيد إرجاع البانوات</button>`:''}<button class="btn secondary" onclick="editRecord('${r.id}')">تعديل</button><button class="btn danger" onclick="deleteRecord('${r.id}')">حذف</button></div></article>`}
+function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+$('contractForm').addEventListener('submit',e=>{e.preventDefault();let {d,total}=calc();if(d<1){alert('تاريخ النهاية لازم يكون نفس تاريخ البداية أو بعده.');return}let paid=+$('paid').value||0;if(paid>total){alert('المبلغ المدفوع أكبر من المبلغ الإجمالي.');return}let old=records.find(r=>r.id===$('editId').value);let r={id:old?.id||String(Date.now()),name:$('name').value.trim(),phone:$('phone').value.trim(),nid:$('nid').value.trim(),kind:$('kind').value.trim(),qty:+$('qty').value,start:$('start').value,end:$('end').value,mode:$('mode').value,daily:+$('daily').value||0,fixed:+$('fixed').value||0,days:d,total,paid,note:$('note').value.trim(),returned:old?.returned||false,created:old?.created||new Date().toISOString()};if(!r.name||!r.phone||!r.kind||r.qty<1){alert('كمّل المعلومات الإلزامية.');return}if(old)records=records.map(x=>x.id===r.id?r:x);else records.push(r);save();resetForm();render();alert('تم حفظ العقد بنجاح.');});
+function resetForm(){$('contractForm').reset();$('editId').value='';$('formTitle').textContent='معلومات الزبون والكراء';$('qty').value=1;$('paid').value=0;$('start').value=today();let t=new Date();t.setDate(t.getDate()+1);$('end').value=new Date(t-t.getTimezoneOffset()*60000).toISOString().slice(0,10);calc()}
+$('reset').onclick=resetForm;
+window.markReturned=id=>{let r=records.find(x=>x.id===id);if(r&&confirm('تأكد بلي الزبون رجّع البانوات كامل؟')){r.returned=true;r.returnDate=today();save();render()}};
+window.deleteRecord=id=>{if(confirm('متأكد من حذف هذا العقد نهائياً؟')){records=records.filter(x=>x.id!==id);save();render()}};
+window.editRecord=id=>{let r=records.find(x=>x.id===id);if(!r)return;for(let k of ['name','phone','nid','kind','qty','start','end','mode','daily','fixed','paid','note'])$(k).value=r[k]??'';$('editId').value=id;$('formTitle').textContent='تعديل عقد موجود';calc();switchTab('new');window.scrollTo(0,0)};
+$('search').addEventListener('input',render);
+function switchTab(id){document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('hidden',x.id!==id));document.querySelectorAll('nav button').forEach(x=>x.classList.toggle('active',x.dataset.tab===id));if(id==='records'||id==='alerts'||id==='stats')render()}
+document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>switchTab(b.dataset.tab));
+$('export').onclick=()=>{let blob=new Blob([JSON.stringify(records,null,2)],{type:'application/json'}),a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='backup-kray-panawat-'+today()+'.json';a.click();URL.revokeObjectURL(a.href)};
+$('importFile').onchange=async e=>{let f=e.target.files[0];if(!f)return;try{let data=JSON.parse(await f.text());if(!Array.isArray(data))throw Error();if(confirm('استرجاع النسخة سيعوض السجلات الحالية. موافق؟')){records=data;save();render();alert('تم استرجاع النسخة.')}}catch(_){alert('الملف غير صالح.')}e.target.value=''};
+calc();render();
+</script></body></html>
